@@ -61,10 +61,6 @@ public class Tarefa {
 	@JoinColumn(name = "id_usuario_criacao", nullable = false)
 	private Usuario usuarioCriacao;
 
-	@ManyToOne
-	@JoinColumn(name = "id_usuario_atualizacao", nullable = true)
-	private Usuario usuarioAtualizacao;
-	
 	@PreUpdate
 	public void preUpdate() {
 		dataAtualizacao = LocalDateTime.now();

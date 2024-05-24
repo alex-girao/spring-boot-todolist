@@ -67,7 +67,11 @@ public class TokenService {
 	}
 
 	public boolean verificarAtivo(String token) {
-		return tokenRepository.findByToken(token).isPresent();
+		Optional<Token> tokenAtual = tokenRepository.findByToken(token);
+		if(tokenAtual.isPresent()) {
+			return !tokenAtual.get().isExpired() && !tokenAtual.get().isRevoked();
+		}
+		return false;
 	}
 
 }

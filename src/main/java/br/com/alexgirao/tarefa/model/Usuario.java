@@ -46,5 +46,9 @@ public class Usuario {
 	
 	@OneToMany(mappedBy = "usuarioCriacao", fetch = FetchType.LAZY)
 	private List<Tarefa> tarefas;
+	
+	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+	private List<Token> tokens;
+
 
 }

@@ -81,9 +81,4 @@ public class UsuarioService implements UserDetailsService {
 		return usuarioRepository.findByEmail(username);
 	}
 
-	public void deslogar(Usuario usuario) {
-		
-		
-	}
-
 }

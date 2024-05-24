@@ -3,6 +3,7 @@ package br.com.alexgirao.tarefa.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -52,7 +53,9 @@ public class AutenticacaoController {
 	@PostMapping("/logout")
     public ResponseEntity<?> logout(Authentication authentication){
         try{
-        	Usuario usuario = (Usuario) authentication.getPrincipal();
+        	UsernamePasswordAuthenticationToken usuarioToken = (UsernamePasswordAuthenticationToken) authentication;
+        	Usuario usuario = usuarioService.pesquisarPorEmail(usuarioToken.getName())
+        			.orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
         	tokenService.revogarToken(usuario);
             return ResponseEntity.ok().build();
         } catch (Exception e){

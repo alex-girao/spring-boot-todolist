@@ -9,6 +9,8 @@ import javax.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import br.com.alexgirao.tarefa.controller.dto.TarefaDTO;
@@ -28,19 +30,25 @@ public class TarefaService {
 	@Autowired
 	private TarefaRepository tarefaRepository;
 	
-	public Tarefa criar(Tarefa tarefa, Usuario usuario) {
+	@Autowired
+	private UsuarioService usuarioService;
+	
+	public Tarefa criar(Tarefa tarefa, UsernamePasswordAuthenticationToken userToken) {
+		Usuario usuario = usuarioService.pesquisarPorEmail(userToken.getName())
+			.orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+		
 		tarefa.setUsuarioCriacao(usuario);
+		
 		return tarefaRepository.save(tarefa);
 	}
 	
 	@Transactional
-	public Tarefa atualizar(Long id, Tarefa tarefa, Usuario usuario) {
+	public Tarefa atualizar(Long id, Tarefa tarefa) {
 		Optional<Tarefa> tarefaAtual = tarefaRepository.findById(id);
 		if (tarefaAtual.isPresent()) {
 			tarefaAtual.get().setTitulo(tarefa.getTitulo());
 			tarefaAtual.get().setDescricao(tarefa.getDescricao());
 			tarefaAtual.get().setStatus(tarefa.getStatus());
-			tarefaAtual.get().setUsuarioAtualizacao(usuario);
 		}
 		return tarefaAtual.get();
 	}

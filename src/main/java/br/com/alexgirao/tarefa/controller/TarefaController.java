@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,6 @@ import br.com.alexgirao.tarefa.controller.form.TarefaForm;
 import br.com.alexgirao.tarefa.controller.response.Response;
 import br.com.alexgirao.tarefa.controller.response.ResponseStatusEnum;
 import br.com.alexgirao.tarefa.model.Tarefa;
-import br.com.alexgirao.tarefa.model.Usuario;
 import br.com.alexgirao.tarefa.service.TarefaService;
 
 /**
@@ -81,16 +81,15 @@ public class TarefaController {
 	public ResponseEntity<Response<TarefaDTO>> criar(@RequestBody @Valid TarefaForm form,
 		Authentication authentication, UriComponentsBuilder uriBuilder) {
 		
-		Usuario usuario = (Usuario) authentication.getPrincipal();
-		
 		Response<TarefaDTO> response = new Response<>();
 		try {
-			Tarefa tarefa = tarefaService.criar(form.get(), usuario);
+			Tarefa tarefa = tarefaService.criar(form.get(), (UsernamePasswordAuthenticationToken) authentication);
 			response.setData(tarefaService.converter(tarefa));
 			response.setMessage(Arrays.asList("Tarefa criada com sucesso."));
 			URI uri = uriBuilder.path("/tarefa/").buildAndExpand(tarefa.getId()).toUri();
 			return ResponseEntity.created(uri).body(response);
 		}catch (Exception e) {
+			e.printStackTrace();
 			response.setStatus(ResponseStatusEnum.ERROR);
 			response.setMessage(Arrays.asList("Ocorreu um erro inesperado. Entre em contato com o administrador do sistema."));
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -101,13 +100,11 @@ public class TarefaController {
 	public ResponseEntity<Response<TarefaDTO>> atualizar(@PathVariable Long id, 
 		@RequestBody @Valid TarefaForm form, Authentication authentication) {
 		
-		Usuario usuario = (Usuario) authentication.getPrincipal();
-		
 		Response<TarefaDTO> response = new Response<>();
 		try {
 			Optional<Tarefa> tarefa = tarefaService.pesquisarPorId(id);
 			if(tarefa.isPresent()) {
-				Tarefa atualizada = tarefaService.atualizar(id, form.get(), usuario);
+				Tarefa atualizada = tarefaService.atualizar(id, form.get());
 				response.setData(tarefaService.converter(atualizada));
 				response.setMessage(Arrays.asList("Tarefa alterada com sucesso."));
 				response.setStatus(ResponseStatusEnum.SUCCESS);
