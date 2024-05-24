@@ -77,4 +77,13 @@ public class UsuarioService implements UserDetailsService {
         throw new SenhaInvalidaException();
     }
 
+	public Optional<Usuario> pesquisarPorEmail(String username) {
+		return usuarioRepository.findByEmail(username);
+	}
+
+	public void deslogar(Usuario usuario) {
+		
+		
+	}
+
 }

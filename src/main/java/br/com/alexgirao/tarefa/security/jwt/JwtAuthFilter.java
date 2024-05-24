@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import br.com.alexgirao.tarefa.service.TokenService;
 import br.com.alexgirao.tarefa.service.UsuarioService;
 
 import javax.servlet.FilterChain;
@@ -18,6 +19,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private JwtService jwtService;
     private UsuarioService usuarioService;
+    private TokenService tokenService;
 
     public JwtAuthFilter( JwtService jwtService, UsuarioService usuarioService ) {
         this.jwtService = jwtService;
@@ -35,8 +37,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if( authorization != null && authorization.startsWith("Bearer")){
             String token = authorization.split(" ")[1];
             boolean isValid = jwtService.tokenValido(token);
+            boolean isAtivo = tokenService.verificarAtivo(token);
 
-            if(isValid){
+            if(isValid && isAtivo){
                 String loginUsuario = jwtService.obterLoginUsuario(token);
                 UserDetails usuario = usuarioService.loadUserByUsername(loginUsuario);
                 UsernamePasswordAuthenticationToken user = new
