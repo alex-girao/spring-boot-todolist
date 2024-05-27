@@ -120,19 +120,3 @@ GET /usuario/:id
 ```bash
 http://localhost:8080/usuario/1
 ```
-
-## Usuário
-#### Criar
-POST /usuario
-```bash
-http://localhost:8080/usuario/
-```
-Request Body
-```bash
-{
-	"nome": "Alex Girao",
-	"email": "alex.girao@email.com",
-	"senha": "123"
-}
-```
-
