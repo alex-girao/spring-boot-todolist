@@ -14,6 +14,10 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+/**
+ * 
+ * @author Alex Girao
+ */
 @Service
 public class JwtService {
 
@@ -23,7 +27,7 @@ public class JwtService {
     @Value("${security.jwt.chave-assinatura}")
     private String chaveAssinatura;
 
-    public String gerarToken(UserDetails usuario){
+    public String gerarToken(UserDetails usuarioAutenticado){
         long expString = Long.valueOf(expiracao);
         LocalDateTime dataHoraExpiracao = LocalDateTime.now().plusMinutes(expString);
         Instant instant = dataHoraExpiracao.atZone(ZoneId.systemDefault()).toInstant();
@@ -31,7 +35,7 @@ public class JwtService {
 
         return Jwts
                 .builder()
-                .setSubject(usuario.getUsername())
+                .setSubject(usuarioAutenticado.getUsername())
                 .setExpiration(data)
                 .signWith( SignatureAlgorithm.HS512, chaveAssinatura )
                 .compact();

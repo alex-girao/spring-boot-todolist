@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,12 +36,15 @@ public class Usuario {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usuario_id_seq")
 	private Long id;
 	
-	@Column(name = "nome", length = 255, nullable = false)
+	@NotEmpty(message = "{usuario.nome.obrigatorio}")
+	@Column(name = "nome", length = 255, nullable = false, unique = true)
 	private String nome;
 	
+	@NotEmpty(message = "{usuario.email.obrigatorio}")
 	@Column(name = "email", length = 255, nullable = false)
 	private String email;
 	
+	@NotEmpty(message = "{usuario.senha.obrigatoria}")
 	@Column(name = "senha", length = 255, nullable = false)
 	private String senha;
 	
@@ -49,6 +53,17 @@ public class Usuario {
 	
 	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
 	private List<Token> tokens;
+	
+	public Usuario(String email, String senha) {
+		this.email = email;
+		this.senha = senha;
+	}
 
-
+	public Usuario(String nome, String email, String senha) {
+		super();
+		this.nome = nome;
+		this.email = email;
+		this.senha = senha;
+	}
+	
 }

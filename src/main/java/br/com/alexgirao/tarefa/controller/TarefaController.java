@@ -1,6 +1,5 @@
 package br.com.alexgirao.tarefa.controller;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,8 +25,11 @@ import br.com.alexgirao.tarefa.controller.dto.TarefaDTO;
 import br.com.alexgirao.tarefa.controller.form.TarefaForm;
 import br.com.alexgirao.tarefa.controller.response.Response;
 import br.com.alexgirao.tarefa.controller.response.ResponseStatusEnum;
+import br.com.alexgirao.tarefa.enums.StatusEnum;
 import br.com.alexgirao.tarefa.model.Tarefa;
 import br.com.alexgirao.tarefa.service.TarefaService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * 
@@ -35,12 +37,14 @@ import br.com.alexgirao.tarefa.service.TarefaService;
  */
 @RestController
 @RequestMapping("/tarefa")
+@Api("Tarefa")
 public class TarefaController {
 	
 	@Autowired
 	private TarefaService tarefaService;
 	
 	@GetMapping
+	@ApiOperation("Lista todas as tarefas")
 	public ResponseEntity<Response<List<TarefaDTO>>> listar(){
 		Response<List<TarefaDTO>> response = new Response<>();
 		try {
@@ -56,6 +60,7 @@ public class TarefaController {
 	}
 	
 	@GetMapping("/{id}")
+	@ApiOperation("Listar tarefa por Id")
 	public ResponseEntity<Response<TarefaDTO>> obter(@PathVariable Long id) {
 		Response<TarefaDTO> response = new Response<>();
 		try {
@@ -78,16 +83,19 @@ public class TarefaController {
 	}
 	
 	@PostMapping
+	@ApiOperation("Criar tarefa")
 	public ResponseEntity<Response<TarefaDTO>> criar(@RequestBody @Valid TarefaForm form,
 		Authentication authentication, UriComponentsBuilder uriBuilder) {
 		
 		Response<TarefaDTO> response = new Response<>();
 		try {
-			Tarefa tarefa = tarefaService.criar(form.get(), (UsernamePasswordAuthenticationToken) authentication);
+			Tarefa tarefa = tarefaService.criar(
+				new Tarefa(form.getTitulo(), form.getDescricao(), StatusEnum.valueOf(form.getStatus())), 
+				(UsernamePasswordAuthenticationToken) authentication);
 			response.setData(tarefaService.converter(tarefa));
 			response.setMessage(Arrays.asList("Tarefa criada com sucesso."));
-			URI uri = uriBuilder.path("/tarefa/").buildAndExpand(tarefa.getId()).toUri();
-			return ResponseEntity.created(uri).body(response);
+			response.setStatus(ResponseStatusEnum.SUCCESS);
+			return ResponseEntity.status(HttpStatus.CREATED).body(response);
 		}catch (Exception e) {
 			e.printStackTrace();
 			response.setStatus(ResponseStatusEnum.ERROR);
@@ -97,14 +105,16 @@ public class TarefaController {
 	}
 	
 	@PutMapping("/{id}")
+	@ApiOperation("Atualizar tarefa por Id")
 	public ResponseEntity<Response<TarefaDTO>> atualizar(@PathVariable Long id, 
-		@RequestBody @Valid TarefaForm form, Authentication authentication) {
+		@RequestBody @Valid TarefaForm form) {
 		
 		Response<TarefaDTO> response = new Response<>();
 		try {
 			Optional<Tarefa> tarefa = tarefaService.pesquisarPorId(id);
 			if(tarefa.isPresent()) {
-				Tarefa atualizada = tarefaService.atualizar(id, form.get());
+				Tarefa atualizada = tarefaService.atualizar(id, 
+					new Tarefa(form.getTitulo(), form.getDescricao(), StatusEnum.valueOf(form.getStatus())));
 				response.setData(tarefaService.converter(atualizada));
 				response.setMessage(Arrays.asList("Tarefa alterada com sucesso."));
 				response.setStatus(ResponseStatusEnum.SUCCESS);
@@ -115,6 +125,7 @@ public class TarefaController {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 			}	
 		}catch (Exception e) {
+			e.printStackTrace();
 			response.setStatus(ResponseStatusEnum.ERROR);
 			response.setMessage(Arrays.asList("Ocorreu um erro inesperado. Entre em contato com o administrador do sistema."));
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -122,6 +133,7 @@ public class TarefaController {
 	}
 	
 	@DeleteMapping("/{id}")
+	@ApiOperation("Remover tarefa por Id")
 	public ResponseEntity<Response<?>> deletar(@PathVariable Long id) {
 		Response<TarefaDTO> response = new Response<>();
 		try {

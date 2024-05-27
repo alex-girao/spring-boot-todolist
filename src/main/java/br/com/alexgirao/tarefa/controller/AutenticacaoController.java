@@ -20,6 +20,8 @@ import br.com.alexgirao.tarefa.model.Usuario;
 import br.com.alexgirao.tarefa.security.jwt.JwtService;
 import br.com.alexgirao.tarefa.service.TokenService;
 import br.com.alexgirao.tarefa.service.UsuarioService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * 
@@ -27,6 +29,7 @@ import br.com.alexgirao.tarefa.service.UsuarioService;
  */
 @RestController
 @RequestMapping("/autenticacao")
+@Api("Atenticação")
 public class AutenticacaoController {
 	
 	@Autowired
@@ -39,9 +42,10 @@ public class AutenticacaoController {
 	private TokenService tokenService;
 	
 	@PostMapping("/login")
+	@ApiOperation("Login")
     public TokenDTO login(@RequestBody LoginForm form){
         try{
-            UserDetails usuarioAutenticado = usuarioService.autenticar(form.getUsuario());
+            UserDetails usuarioAutenticado = usuarioService.autenticar(new Usuario(form.getEmail(), form.getSenha()));
             String token = jwtService.gerarToken(usuarioAutenticado);
             tokenService.renovarToken(usuarioAutenticado, token);
             return new TokenDTO(usuarioAutenticado.getUsername(), token);
@@ -51,6 +55,7 @@ public class AutenticacaoController {
     }
 	
 	@PostMapping("/logout")
+	@ApiOperation("Logout")
     public ResponseEntity<?> logout(Authentication authentication){
         try{
         	UsernamePasswordAuthenticationToken usuarioToken = (UsernamePasswordAuthenticationToken) authentication;

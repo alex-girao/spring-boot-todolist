@@ -1,5 +1,6 @@
 package br.com.alexgirao.tarefa.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -79,6 +80,14 @@ public class UsuarioService implements UserDetailsService {
 
 	public Optional<Usuario> pesquisarPorEmail(String username) {
 		return usuarioRepository.findByEmail(username);
+	}
+	
+	public List<Usuario> pesquisarTodos() {
+		return usuarioRepository.findAll();
+	}
+
+	public void removerTodos() {
+		usuarioRepository.deleteAll();
 	}
 
 }

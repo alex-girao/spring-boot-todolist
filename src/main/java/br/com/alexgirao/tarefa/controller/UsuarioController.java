@@ -25,6 +25,8 @@ import br.com.alexgirao.tarefa.controller.response.ResponseStatusEnum;
 import br.com.alexgirao.tarefa.exception.EmailExistenteException;
 import br.com.alexgirao.tarefa.model.Usuario;
 import br.com.alexgirao.tarefa.service.UsuarioService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * 
@@ -32,18 +34,21 @@ import br.com.alexgirao.tarefa.service.UsuarioService;
  */
 @RestController
 @RequestMapping("/usuario")
+@Api("Usuário")
 public class UsuarioController {
 	
 	@Autowired
 	private UsuarioService usuarioService;
 	
 	@PostMapping
+	@ApiOperation("Cadastrar usuário")
 	public ResponseEntity<Response<UsuarioDTO>> criar(@RequestBody @Valid UsuarioForm form,
 		UriComponentsBuilder uriBuilder) {
 		Response<UsuarioDTO> response = new Response<>();
 		try {
-			Usuario usuario = usuarioService.criar(form.getUsuario());
+			Usuario usuario = usuarioService.criar(new Usuario(form.getNome(), form.getEmail(), form.getSenha()));
 			URI uri = uriBuilder.path("/usuario/").buildAndExpand(usuario.getId()).toUri();
+			response.setStatus(ResponseStatusEnum.SUCCESS);
 			response.setData(usuarioService.converter(usuario));
 			response.setMessage(Arrays.asList("Usuário criado com sucesso."));
 			return ResponseEntity.created(uri).body(response);
@@ -59,6 +64,7 @@ public class UsuarioController {
 	}
 	
 	@GetMapping("/{id}")
+	@ApiOperation("Listar usuário por Id")
 	public ResponseEntity<Response<UsuarioDetalhadoDTO>> obter(@PathVariable Long id) {
 		Response<UsuarioDetalhadoDTO> response = new Response<>();
 		try {

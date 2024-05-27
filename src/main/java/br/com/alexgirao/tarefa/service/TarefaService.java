@@ -42,6 +42,11 @@ public class TarefaService {
 		return tarefaRepository.save(tarefa);
 	}
 	
+	public Tarefa criar(Tarefa tarefa, Usuario usuario) {
+		tarefa.setUsuarioCriacao(usuario);
+		return tarefaRepository.save(tarefa);
+	}
+	
 	@Transactional
 	public Tarefa atualizar(Long id, Tarefa tarefa) {
 		Optional<Tarefa> tarefaAtual = tarefaRepository.findById(id);

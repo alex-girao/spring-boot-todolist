@@ -71,4 +71,36 @@ public class Tarefa {
 		dataCriacao = LocalDateTime.now();
 	}
 
+	public Tarefa(String titulo, String descricao, StatusEnum status) {
+		super();
+		this.titulo = titulo;
+		this.descricao = descricao;
+		this.status = status;
+	}
+	
+	public Tarefa(Long id, String titulo, String descricao, StatusEnum status) {
+		super();
+		this.id = id;
+		this.titulo = titulo;
+		this.descricao = descricao;
+		this.status = status;
+	}
+	
+	public Tarefa(Long id, String titulo, String descricao, StatusEnum status, Usuario usuarioCriacao) {
+		super();
+		this.id = id;
+		this.titulo = titulo;
+		this.descricao = descricao;
+		this.status = status;
+		this.usuarioCriacao = usuarioCriacao;
+	}
+	
+	public Tarefa(String titulo, String descricao, StatusEnum status, Usuario usuarioCriacao) {
+		super();
+		this.titulo = titulo;
+		this.descricao = descricao;
+		this.status = status;
+		this.usuarioCriacao = usuarioCriacao;
+	}
+	
 }
